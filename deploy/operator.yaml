@@ -14,8 +14,8 @@ spec:
     spec:
       containers:
         - name: clustersecretoperator
-          image: justinbarrick/clustersecretoperator
-          imagePullPolicy: Always
+          image: justinbarrick/clustersecretoperator:master-d77ed61
+          imagePullPolicy: IfNotPresent
           env:
             - name: WATCH_NAMESPACE
               valueFrom:
