@@ -1,4 +1,8 @@
 apiVersion: "clustersecret.codesink.net/v1alpha1"
 kind: "ClusterSecret"
 metadata:
-  name: "example"
+  name: "my-certificate"
+data:
+  tls.crt: RGF0YQ==
+  tls.key: RGF0YQ==
+type: kubernetes.io/tls

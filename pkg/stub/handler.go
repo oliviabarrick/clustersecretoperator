@@ -24,28 +24,44 @@ type Handler struct {
 func (h *Handler) Handle(ctx context.Context, event sdk.Event) error {
 	switch o := event.Object.(type) {
 	case *v1alpha1.ClusterSecret:
-		err := sdk.Create(newbusyBoxPod(o))
-		if err != nil && !errors.IsAlreadyExists(err) {
-			logrus.Errorf("Failed to create busybox pod : %v", err)
-			return err
-		}
+    namespaceList := &corev1.NamespaceList{
+        TypeMeta: metav1.TypeMeta{
+            Kind: "Namespace",
+            APIVersion: "v1",
+        },
+    }
+
+    err := sdk.List("", namespaceList)
+    if err != nil {
+        return err
+    }
+
+    for _, namespace := range namespaceList.Items {
+		    err = sdk.Create(newClusterSecret(o, namespace.Name))
+		    if err != nil && !errors.IsAlreadyExists(err) {
+		        logrus.Errorf("Failed to create secret: %v", err)
+		        return err
+		    }
+    }
 	}
 	return nil
 }
 
 // newbusyBoxPod demonstrates how to create a busybox pod
-func newbusyBoxPod(cr *v1alpha1.ClusterSecret) *corev1.Pod {
+func newClusterSecret(cr *v1alpha1.ClusterSecret, namespace string) *corev1.Secret {
+	logrus.Infof("creating cluster secret %s in %s", cr.Name, namespace)
 	labels := map[string]string{
-		"app": "busy-box",
+		"clustersecret.name": cr.Name,
+		"clustersecret.namespace": cr.Namespace,
 	}
-	return &corev1.Pod{
+	return &corev1.Secret{
 		TypeMeta: metav1.TypeMeta{
-			Kind:       "Pod",
+			Kind:       "Secret",
 			APIVersion: "v1",
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "busy-box",
-			Namespace: cr.Namespace,
+			Name:      "cluster-" + cr.Name,
+			Namespace: namespace,
 			OwnerReferences: []metav1.OwnerReference{
 				*metav1.NewControllerRef(cr, schema.GroupVersionKind{
 					Group:   v1alpha1.SchemeGroupVersion.Group,
@@ -55,14 +71,8 @@ func newbusyBoxPod(cr *v1alpha1.ClusterSecret) *corev1.Pod {
 			},
 			Labels: labels,
 		},
-		Spec: corev1.PodSpec{
-			Containers: []corev1.Container{
-				{
-					Name:    "busybox",
-					Image:   "busybox",
-					Command: []string{"sleep", "3600"},
-				},
-			},
-		},
+		Data: cr.Data,
+		StringData: cr.StringData,
+		Type: cr.Type,
 	}
 }

@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: clustersecretoperator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: clustersecretoperator
+  template:
+    metadata:
+      labels:
+        name: clustersecretoperator
+    spec:
+      containers:
+        - name: clustersecretoperator
+          image: justinbarrick/clustersecretoperator
+          command:
+          - clustersecretoperator
+          imagePullPolicy: Always
+          env:
+            - name: WATCH_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
