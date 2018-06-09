@@ -1,0 +1,4 @@
+apiVersion: "clustersecret.codesink.net/v1alpha1"
+kind: "ClusterSecret"
+metadata:
+  name: "example"

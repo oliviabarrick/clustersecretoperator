@@ -1,0 +1,3 @@
+apiVersion: clustersecret.codesink.net/v1alpha1
+kind: ClusterSecret
+projectName: clustersecretoperator
