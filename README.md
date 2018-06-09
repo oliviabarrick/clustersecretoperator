@@ -32,3 +32,9 @@ kubectl apply -f example.yaml
 ```
 
 The secret `cluster-my-certificate` will now be available in every namespace.
+
+To delete the secret, delete the `ClusterSecret`:
+
+```
+kubectl delete clustersecret my-certificate
+```

@@ -15,8 +15,6 @@ spec:
       containers:
         - name: clustersecretoperator
           image: justinbarrick/clustersecretoperator
-          command:
-          - clustersecretoperator
           imagePullPolicy: Always
           env:
             - name: WATCH_NAMESPACE
